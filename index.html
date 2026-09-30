@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ledgerly — Monthly Money Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-icon">L</div>
+
+        <div>
+          <h1>Ledgerly</h1>
+          <p>Monthly money tracker</p>
+        </div>
+      </div>
+
+      <div class="month-control">
+        <label for="selected-month">Viewing month</label>
+        <input id="selected-month" type="month">
+      </div>
+    </header>
+
+    <section class="hero">
+      <div>
+        <p class="eyebrow hero-eyebrow">MONTHLY OVERVIEW</p>
+        <h2 id="month-title">Your monthly summary</h2>
+        <p class="hero-text">
+          Record your transactions and review your monthly activity.
+        </p>
+      </div>
+
+      <button id="open-transaction-modal" class="primary-button hero-button" type="button">
+        + Add transaction
+      </button>
+    </section>
+
+    <section class="summary-grid">
+      <article class="summary-card income-card">
+        <p class="summary-label">Income</p>
+        <h3 id="income-total">S\$0.00</h3>
+        <p class="summary-description">Money received this month</p>
+      </article>
+
+      <article class="summary-card expense-card">
+        <p class="summary-label">Expenses</p>
+        <h3 id="expense-total">S\$0.00</h3>
+        <p class="summary-description">Money spent this month</p>
+      </article>
+
+      <article class="summary-card balance-card">
+        <p class="summary-label">Balance</p>
+        <h3 id="balance-total">S\$0.00</h3>
+        <p class="summary-description">Income minus expenses</p>
+      </article>
+    </section>
+
+    <section class="content-grid">
+      <article class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">SPENDING LIMIT</p>
+            <h2>Monthly expense limit</h2>
+          </div>
+
+          <button id="edit-budget-button" class="text-button" type="button">
+            Edit
+          </button>
+        </div>
+
+        <div id="budget-empty-state" class="budget-empty">
+          <p>No monthly limit has been set.</p>
+
+          <button id="set-budget-button" class="secondary-button" type="button">
+            Set a limit
+          </button>
+        </div>
+
+        <div id="budget-content" class="hidden">
+          <div class="budget-values">
+            <strong id="budget-spent">S\$0.00 spent</strong>
+            <span id="budget-limit">of S\$0.00</span>
+          </div>
+
+          <div class="progress-track">
+            <div id="budget-progress" class="progress-bar"></div>
+          </div>
+
+          <p id="budget-status" class="muted-text"></p>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">EXPENSE BREAKDOWN</p>
+            <h2>Top categories</h2>
+          </div>
+        </div>
+
+        <div id="category-breakdown" class="category-breakdown"></div>
+      </article>
+    </section>
+
+    <section class="panel insights-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">MONTHLY INSIGHTS</p>
+          <h2>Where your money went</h2>
+          <p class="muted-text">Expense groups for the selected month.</p>
+        </div>
+      </div>
+
+      <div id="insights-empty-state" class="empty-state">
+        Add expense transactions to see your monthly spending breakdown.
+      </div>
+
+      <div id="insights-content" class="insights-layout hidden">
+        <div class="donut-area">
+          <div id="spending-donut" class="spending-donut">
+            <div class="donut-center">
+              <span>Total expenses</span>
+              <strong id="donut-total">S\$0.00</strong>
+            </div>
+          </div>
+        </div>
+
+        <div id="spending-legend" class="spending-legend"></div>
+      </div>
+    </section>
+
+    <section class="panel transactions-panel">
+      <div class="panel-heading transactions-heading">
+        <div>
+          <p class="eyebrow">TRANSACTION HISTORY</p>
+          <h2>Transactions</h2>
+        </div>
+
+        <div class="transaction-tools">
+          <select id="transaction-filter" aria-label="Filter transactions">
+            <option value="all">All transactions</option>
+            <option value="income">Income only</option>
+            <option value="expense">Expenses only</option>
+          </select>
+
+          <button id="export-button" class="secondary-button" type="button">
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      <div id="transaction-list" class="transaction-list"></div>
+    </section>
+  </main>
+
+  <div id="transaction-modal" class="modal hidden">
+    <div class="modal-backdrop" data-close-modal="transaction-modal"></div>
+
+    <section class="modal-content" role="dialog" aria-modal="true">
+      <div class="modal-heading">
+        <h2>Add transaction</h2>
+
+        <button class="close-button" data-close-modal="transaction-modal" type="button">
+          ×
+        </button>
+      </div>
+
+      <form id="transaction-form">
+        <div class="type-selector">
+          <label>
+            <input type="radio" name="transaction-type" value="expense" checked>
+            <span>Expense</span>
+          </label>
+
+          <label>
+            <input type="radio" name="transaction-type" value="income">
+            <span>Income</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label for="transaction-name">Description</label>
+          <input
+            id="transaction-name"
+            type="text"
+            placeholder="Example: Grocery shopping"
+            required
+          >
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="transaction-amount">Amount (S$)</label>
+            <input
+              id="transaction-amount"
+              type="number"
+              min="0.01"
+              step="0.01"
+              placeholder="0.00"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="transaction-date">Date</label>
+            <input id="transaction-date" type="date" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="transaction-category">Category</label>
+          <select id="transaction-category" required></select>
+        </div>
+
+        <div class="modal-actions">
+          <button class="secondary-button" data-close-modal="transaction-modal" type="button">
+            Cancel
+          </button>
+
+          <button class="primary-button" type="submit">
+            Save transaction
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div id="budget-modal" class="modal hidden">
+    <div class="modal-backdrop" data-close-modal="budget-modal"></div>
+
+    <section class="modal-content small-modal" role="dialog" aria-modal="true">
+      <div class="modal-heading">
+        <h2>Set monthly expense limit</h2>
+
+        <button class="close-button" data-close-modal="budget-modal" type="button">
+          ×
+        </button>
+      </div>
+
+      <form id="budget-form">
+        <div class="form-group">
+          <label for="budget-amount">Monthly limit (S$)</label>
+          <input
+            id="budget-amount"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="Example: 1500"
+          >
+        </div>
+
+        <div class="modal-actions">
+          <button class="secondary-button" data-close-modal="budget-modal" type="button">
+            Cancel
+          </button>
+
+          <button class="primary-button" type="submit">
+            Save limit
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
